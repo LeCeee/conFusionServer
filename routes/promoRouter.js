@@ -20,7 +20,7 @@ promotionsRouter.route('/')
         console.log('promotion Created',promotion);        
         res.statusCode = 200;
         res.setHeader('Content-Type','application/json');
-        res.json(promotions);  
+        res.json(promotion);  
     },(err) => next(err))
     .catch( (err) => next(err));
 })
@@ -29,28 +29,48 @@ promotionsRouter.route('/')
     res.end('put method not supported');
 })
 .delete((req,res,next) =>{
-    res.end('deleting all the promotions');
+    Promotions.remove({})
+    .then((resp) => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type','application/json');
+        res.json(resp);
+    }, (err) => next(err))
+    .catch((err) => next(err));
 });
 
 promotionsRouter.route('/:promoId')
-.all((req,res,next) => {
-    res.statusCode = 200;
-    res.setHeader('Content-Type','text/plain');
-    next();
-})
 .get((req,res,next) => {
-    res.end('getting promotions: ' + req.params.promoId);
+    Promotions.findById(req.params.promoId)
+    .then((promotion) => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type','application/json');
+        res.json(promotion);
+    }, (err) => next(err))
+    .catch((err) => next(err));
 })
 .post((req,res,next) => {
     res.statusCode = 403;
     res.end('POST method not supported ');
 })
 .put((req,res,next) => {
-    res.write('updating promotion: '+ req.params.promoId)
-    res.end(' with details -> name: ' + req.body.name + ' descriptions: ' + req.body.description);
+    Promotions.findByIdAndUpdate(req.params.promoId,{
+        $set: req.body
+    },{new :true})
+    .then((promotion) => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type','application/json');
+        res.json(promotion);
+    }, (err) => next(err))
+    .catch((err) => next(err));
 })
 .delete((req,res,next) =>{
-    res.end('deleting the promotions:' + req.params.promoId);
+    Promotions.findByIdAndRemove(req.params.promoId)
+    .then((resp) => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type','application/json');
+        res.json(resp);
+    }, (err) => next(err))
+    .catch((err) => next(err));
 });
 
 module.exports = promotionsRouter;
