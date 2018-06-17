@@ -1,20 +1,28 @@
 const express = require('express');
 const bodyparser = require('body-parser');
+const Promotions = require('../model/prmotions');
 const promotionsRouter = express.Router();
 promotionsRouter.use(bodyparser.json());
 
 promotionsRouter.route('/')
-.all((req,res,next) => {
-    res.statusCode = 200;
-    res.setHeader('Content-Type','text/plain');
-    next();
-})
 .get((req,res,next) => {
-    res.end('getting all prmotions');
+    Promotions.find({})
+    .then((promotions) => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type','application/json');
+        res.json(promotions);
+    }, (err) => next(err))
+    .catch((err) => next(err));
 })
 .post((req,res,next) => {
-    res.write('creating a promotion ');
-    res.end('created promotion with name '  + req.body.name + ' and details '+ req.body.description);
+    Promotions.create(req.body)
+    .then((promotion) => {
+        console.log('promotion Created',promotion);        
+        res.statusCode = 200;
+        res.setHeader('Content-Type','application/json');
+        res.json(promotions);  
+    },(err) => next(err))
+    .catch( (err) => next(err));
 })
 .put((req,res,next) => {
     res.statusCode = 403;
