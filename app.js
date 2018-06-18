@@ -35,7 +35,7 @@ app.use(cookieParser());
 
 function auth(req,res,next) {
   console.log(req.headers);
-  var authHeader = req.headers.authorisation;
+  var authHeader = req.headers.authorization;
   if (!authHeader) {
     var err = new Error('you are not authorised');
     res.setHeader('WWW-Authenticate','Basic');
@@ -43,9 +43,11 @@ function auth(req,res,next) {
     next(err);
     return;
   }
-  var auth = new Buffer(authHeader.split(' ')[1], 'base64').toString().split(': ');
+  console.log('hellleeyyy');
+  var auth = new Buffer(authHeader.split(' ')[1], 'base64').toString().split(':');
   var user = auth[0];
   var pass = auth [1];
+  console.log(user);
   if(user == 'admin' && pass == 'password'){
     next();
   } else{
@@ -58,6 +60,7 @@ function auth(req,res,next) {
 }
 
 app.use(auth);
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
