@@ -150,6 +150,15 @@ dishRouter.route('/:dishId/comments')
 	}, (err) => next(err))
 	.catch((err) => next(err));
 });
+// var verifyCreater = (req,res,next) => {
+// 	if((req.com.author).equals(req.user._id))
+// 		next();
+// 	else {
+// 		var err = new Errro('only creator can perform this');
+// 		err.status = 403;
+// 		return next(err);
+// 	}
+// }
 
 dishRouter.route('/:dishId/comments/:commentId')
 .get((req,res,next) => {
@@ -181,8 +190,14 @@ dishRouter.route('/:dishId/comments/:commentId')
 })
 .put(authenticate.verifyUser,(req, res, next) => {
 	Dishes.findById(req.params.dishId)
+	//.populate('comments.author')
 	.then((dish) => {
 		if(dish !=  null && dish.comments.id(req.params.commentId) != null){
+			if( !(dish.comments.id(req.params.commentId).author).equals(req.user._id)) {
+				var err = new Error('only creator can perform this');
+				err.status = 401;
+				return next(err);
+			}
 			if(req.body.rating){
 				dish.comments.id(req.params.commentId).rating = req.body.rating;
 			}
@@ -214,6 +229,12 @@ dishRouter.route('/:dishId/comments/:commentId')
 	.then((dish) => {
 		if(dish !=  null && dish.comments.id(req.params.commentId) != null){
 			
+			if( !(dish.comments.id(req.params.commentId).author).equals(req.user._id)) {
+				var err = new Error('only creator can perform this');
+				err.status = 401;
+				return next(err);
+			}
+
 			dish.comments.id(req.params.commentId).remove();
 			
 			dish.save()

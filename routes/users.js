@@ -9,7 +9,10 @@ router.use(bodyParser.json());
 
 router.get('/', authenticate.verifyUser, authenticate.verifyAdmin, function(req, res, next) {
   User.find({})
-    .then((users) => {
+    .then((err,users) => {
+      if(err) {
+        return next(err);
+      }
         res.statusCode = 200;
         res.setHeader('Content-Type','application/json');
         res.json(users);

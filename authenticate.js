@@ -53,10 +53,19 @@ exports.jwtPassport = passport.use(new JwtStrategy(opts,
     exports.verifyAdmin = (req,res,next) => {
         if(req.user.admin)
             next();
-            
+
         else {
             var err = new Error('you are not an admin');
             err.status = 403;
             return next(err);
         }
     }
+    // exports.verifyCreater = (req,res,next) => {
+    //     if((req.coomments.author).equals(req.user._id))
+    //         next();
+    //     else {
+    //         var err = new Errro('only creator can perform this');
+    //         err.status = 403;
+    //         return next(err);
+    //     }
+    // }
